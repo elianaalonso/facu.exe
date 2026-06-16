@@ -1,0 +1,452 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'JetBrains Mono', monospace;
+    background:#0d1117;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    color:white;
+}
+
+/* On the welcome page we want normal document flow and full-width sections */
+body.welcome-page{
+    display:block;
+    align-items:initial;
+    justify-content:initial;
+    overflow:auto;
+}
+
+.background-glow{
+    position:absolute;
+    width:500px;
+    height:500px;
+    background:#4f46e5;
+    filter:blur(180px);
+    opacity:.15;
+}
+
+.login-container{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+}
+
+.terminal-window{
+    width:100%;
+    max-width:700px;
+
+    background:rgba(18,22,30,.8);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    box-shadow:
+    0 0 40px rgba(0,0,0,.5);
+}
+
+.terminal-header{
+    display:flex;
+    gap:10px;
+
+    padding:18px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.terminal-header span{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#444;
+}
+
+.terminal-body{
+    padding:40px;
+}
+
+.boot-text{
+    font-size:2rem;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#8b949e;
+    margin-bottom:40px;
+}
+
+.login-box{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+label{
+    color:#8b949e;
+    font-size:.9rem;
+}
+
+input{
+    padding:14px;
+    border:none;
+    border-radius:10px;
+
+    background:#161b22;
+    color:white;
+
+    font-family:inherit;
+}
+
+button{
+    margin-top:10px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:#4f46e5;
+    color:white;
+
+    font-family:inherit;
+    font-weight:bold;
+
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+#message{
+    margin-top:25px;
+    color:#58a6ff;
+}
+
+#message.success{
+    color:#7cfc00;
+}
+
+#message.denied{
+    color:#ff7b72;
+}
+
+.loader.oculto{
+    display:none;
+}
+
+/* Utility hidden class for overlays and elements */
+.oculto{
+    display:none !important;
+}
+
+/* Fullscreen loader overlay */
+.full-loader{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:rgba(5,9,15,0.85);
+    z-index:9999;
+    gap:16px;
+}
+
+.spinner{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    border:6px solid rgba(255,255,255,0.08);
+    border-top-color:#4f46e5;
+    animation: spin 1s linear infinite;
+}
+
+.full-loader-text{
+    color:#9fb4ff;
+    font-size:1.1rem;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg);}
+}
+
+/* Update modal styles */
+.update-modal{
+    width:420px;
+    max-width:90%;
+    background:rgba(10,14,20,0.95);
+    padding:22px;
+    border-radius:12px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:center;
+}
+
+.update-modal h2{margin:0;color:#cfe0ff}
+.update-modal p{color:#9fb4ff;text-align:center;margin:0}
+
+.update-actions{display:flex;gap:10px;margin-top:8px}
+.update-actions button{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;background:#4f46e5;color:white}
+.update-actions button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#9fb4ff}
+
+.update-progress{width:100%;display:flex;align-items:center;gap:12px;margin-top:8px}
+.spinner.small{width:28px;height:28px;border-width:4px}
+.progress-bar{flex:1;height:10px;background:#101318;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:#4f46e5;width:0%}
+.update-progress p{margin:0;color:#cfe0ff;font-size:0.95rem}
+
+.update-modal.shake{animation:shake .6s; border:1px solid #ff4d4d}
+
+.hint{
+    margin-top:12px;
+    font-size:.85rem;
+    color:#6e7681;
+}
+
+.error{
+    border:1px solid #ff4d4d !important;
+    animation: shake .4s;
+}
+
+@keyframes shake{
+
+    0%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-6px);}
+    80%{transform:translateX(6px);}
+    100%{transform:translateX(0);}
+}
+
+.loader{
+    width:100%;
+    height:8px;
+    background:#161b22;
+    border-radius:50px;
+    margin-top:20px;
+    overflow:hidden;
+}
+
+.loader-bar{
+    height:100%;
+    width:0%;
+    background:#4f46e5;
+}
+
+.top-bar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:20px 40px;
+
+    background:rgba(13,17,23,.75);
+
+    backdrop-filter:blur(20px);
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+    z-index:999;
+}
+
+.logo{
+    font-weight:700;
+    letter-spacing:2px;
+}
+
+.counter{
+    color:#8b949e;
+    font-size:.9rem;
+}
+
+.hero{
+
+    min-height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+}
+
+.version{
+
+    color:#4f46e5;
+
+    margin-bottom:10px;
+
+    letter-spacing:3px;
+}
+
+.hero h1{
+
+    font-size:5rem;
+
+    margin-bottom:20px;
+}
+
+.status{
+
+    color:#8b949e;
+
+    margin-bottom:40px;
+}
+
+.continue-btn{
+
+    min-width:220px;
+}
+
+/* ========================= */
+/* WELCOME SCREEN */
+/* ========================= */
+
+.welcome-screen{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:40px 0; /* keep vertical padding but full-width horizontally */
+    position:relative;
+    overflow:hidden;
+}
+
+/* Inner centered panel holds the content but allows full-bleed background */
+.panel{
+    width:100%;
+    max-width:980px;
+    margin:0 auto;
+    padding:48px 36px; /* reduced vertical & horizontal padding to save space */
+}
+
+.welcome-screen::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    width:1200px;
+    height:1200px;
+    background:#4f46e5;
+    filter:blur(260px);
+    opacity:.12;
+    z-index:-1;
+}
+
+.welcome-screen .version{
+    font-size:.85rem;
+    color:#4f46e5;
+    letter-spacing:3px;
+    margin-bottom:12px;
+    animation:fadeUp .8s ease forwards;
+}
+
+.welcome-screen h1{
+    font-size:4.8rem; /* slightly smaller to avoid large vertical footprint */
+    font-weight:700;
+    margin-bottom:12px;
+    line-height:1;
+    animation:fadeUp .8s ease forwards;
+}
+
+.file-info{
+
+    margin-top:20px;
+    margin-bottom:40px;
+
+    animation:fadeUp 1.2s ease forwards;
+}
+
+.file-info p{
+
+    color:#8b949e;
+}
+
+.file-info h2{
+    font-size:2.4rem; /* reduce size */
+    margin:8px 0;
+}
+
+.days-counter{
+    color:white;
+    font-size:1.15rem;
+    margin-bottom:20px; /* reduce space before button */
+    opacity:0;
+    animation:fadeUp 1s ease forwards;
+    animation-delay:1s;
+}
+
+/* Larger typography for desktop screens */
+@media (min-width:1100px){
+    .welcome-screen h1{font-size:6.4rem}
+    .file-info h2{font-size:3rem}
+    .days-counter{font-size:1.25rem}
+    .panel{padding:56px 48px}
+}
+
+@media (min-width:1400px){
+    .welcome-screen h1{font-size:7.2rem}
+    .file-info h2{font-size:3.2rem}
+    .panel{padding:72px 80px}
+}
+
+/* Slightly tighter spacing for medium screens */
+@media (max-width:700px){
+    .welcome-screen{padding:28px}
+    .welcome-screen h1{font-size:3.4rem}
+    .file-info h2{font-size:2rem}
+}
+
+#enterBtn{
+
+    min-width:260px;
+
+    opacity:0;
+
+    animation:fadeUp .8s ease forwards;
+    animation-delay:1.5s;
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+    }
+}

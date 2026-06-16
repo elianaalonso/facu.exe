@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenido — FACU.EXE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body class="welcome-page">
+
+  <header class="top-bar">
+    <div class="logo">FACU.EXE</div>
+    <div class="counter">
+      <span id="months">0</span> meses · <span id="days">0</span> días · <span id="hours">0</span> horas
+    </div>
+  </header>
+
+  <main class="welcome-screen">
+    <div class="panel">
+      <p class="version">v1.8</p>
+      <h1>FACU.EXE</h1>
+
+      <div class="file-info">
+        <p>Archivo localizado</p>
+        <h2>17.12.2024</h2>
+        <p>19:00</p>
+      </div>
+
+      <p class="days-counter"><span id="monthsRegistered">...</span></p>
+
+      <div style="margin-top:18px;">
+        <button id="enterBtn" class="primary-btn">ABRIR ARCHIVO</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Real-time counter for header (#months, #days, #hours) and body (#monthsRegistered)
+    (function(){
+      const start = new Date('2024-12-17T19:00:00');
+
+      function addMonths(date, months){
+        const d = new Date(date.getTime());
+        const targetMonth = d.getMonth() + months;
+        d.setMonth(targetMonth);
+        // handle month overflow (e.g., Jan 31 + 1 month -> Feb 28/29)
+        while(d.getMonth() !== ((targetMonth)%12 + 12)%12){
+          d.setDate(d.getDate() - 1);
+        }
+        return d;
+      }
+
+      function compute(now){
+        // compute full months elapsed
+        let months = 0;
+        let cursor = new Date(start.getTime());
+        while(true){
+          const next = addMonths(cursor, 1);
+          if(next <= now){
+            months += 1;
+            cursor = next;
+          } else break;
+        }
+
+        const remainingMs = now - cursor;
+        const msPerMinute = 60 * 1000;
+        const msPerHour = 60 * msPerMinute;
+        const msPerDay = 24 * msPerHour;
+
+        const days = Math.floor(remainingMs / msPerDay);
+        const hours = Math.floor((remainingMs % msPerDay) / msPerHour);
+
+        return { months, days, hours };
+      }
+
+      function updateAll(){
+        const now = new Date();
+        const parts = compute(now);
+
+        const elBody = document.getElementById('monthsRegistered');
+        if (elBody) elBody.textContent = `${parts.months} meses · ${parts.days} días · ${parts.hours} horas`;
+
+        const monthsEl = document.getElementById('months');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        if(monthsEl) monthsEl.textContent = parts.months;
+        if(daysEl) daysEl.textContent = parts.days;
+        if(hoursEl) hoursEl.textContent = parts.hours;
+      }
+
+      updateAll();
+      setInterval(updateAll, 1000);
+
+      const enter = document.getElementById('enterBtn');
+      if(enter){
+        enter.addEventListener('click', () => {
+          window.location.href = 'experience.html';
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

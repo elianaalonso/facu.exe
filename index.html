@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>facu.exe</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="background-glow"></div>
+
+    <main class="login-container">
+
+        <div class="terminal-window">
+
+            <div class="terminal-header">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="terminal-body">
+
+                <p class="boot-text">
+                    FACU.EXE v1.8
+                </p>
+
+                <p class="subtitle">
+                    Sistema iniciado correctamente.
+                </p>
+
+                <div class="login-box">
+
+                    <label>Usuario</label>
+
+                    <input
+                        type="text"
+                        value="Facu"
+                        disabled
+                    >
+
+                    <label>Contraseña</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Ingresar contraseña..."
+                    >
+
+                      <p class="hint">
+                        Pista: Fecha del primer guardado.
+                    </p>
+
+                    <div class="loader oculto">
+    <div class="loader-bar"></div>
+</div>
+
+                    <button id="loginBtn">
+                        INICIAR SESIÓN
+                    </button>
+
+                </div>
+
+                <p id="message"></p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+        <!-- Fullscreen update modal / loader (hidden by default) -->
+        <div class="full-loader oculto" id="fullLoader">
+            <div class="update-modal">
+                <h2>Actualización disponible</h2>
+                <p id="updateMessage">Se detectó una nueva actualización. ¿Deseas instalarla ahora?</p>
+
+                <div class="update-actions" id="updateActions">
+                    <button id="installBtn">Instalar ahora</button>
+                    <button id="skipBtn" class="secondary">Posponer</button>
+                </div>
+
+                <div class="update-progress oculto" id="updateProgress">
+                    <div class="spinner small"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="updateFill" style="width:0%"></div>
+                    </div>
+                    <p id="updateStatus">Preparando instalación...</p>
+                </div>
+            </div>
+        </div>
+
+   
+
+<script src="script.js"></script>
+</body>
+</html>

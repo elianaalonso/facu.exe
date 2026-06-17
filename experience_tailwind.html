@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth bg-[#0A0A0C] text-[#F8FAFC]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FACU.EXE // SYSTEM RUNTIME</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Fira Code"', 'monospace'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              bg: '#0A0A0C',
+              surface: '#0F0F13',
+              indigo: '#4F46E5',
+              blueSteel: '#3B82F6',
+              emerald: '#10B981',
+              slate: '#94A3B8',
+              border: 'rgba(255, 255, 255, 0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Minimal overrides to match dark aesthetic locally */
+    body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Fira Code', monospace; }
+    .scrollbar-thin::-webkit-scrollbar { height:8px; width:8px }
+    /* Glow effects for login container */
+    #login-container{transition:box-shadow .32s ease,border-color .32s ease}
+    #login-container.glow-success{box-shadow:0 30px 60px rgba(79,70,229,0.12),0 0 0 6px rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.35)}
+    #login-container.glow-error{box-shadow:0 20px 40px rgba(239,68,68,0.12),0 0 0 6px rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.45)}
+    /* Floating video placeholders on welcome */
+    #floating-videos{position:absolute;inset:0;pointer-events:none}
+    .floating-item{position:absolute;width:160px;height:100px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,#0f1724 0%, #0b0c0f 100%);border:1px solid rgba(255,255,255,0.04);box-shadow:0 6px 30px rgba(3,7,18,0.6);display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;transition:transform .24s ease,box-shadow .24s ease}
+    .floating-item .thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-family:monospace;font-size:12px}
+    .floating-item:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 18px 50px rgba(79,70,229,0.12)}
+    /* large floating variants for full panel */
+    .floating-big{border-radius:14px;width:520px;height:320px;min-width:360px;min-height:220px}
+    .floating-big .thumb{font-size:14px;color:#cbd5e1}
+    @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+    .floating-anim{animation:floaty 6s ease-in-out infinite}
+    /* Big celebratory headline */
+    #welcome-celebrate{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    #welcome-celebrate h2{font-family:Inter, sans-serif;font-weight:700;letter-spacing:.12em;color:transparent;background:linear-gradient(90deg,#4F46E5,#3B82F6);-webkit-background-clip:text;font-size:48px;text-align:center;text-transform:uppercase;text-shadow:0 6px 30px rgba(59,130,246,0.06)}
+  </style>
+</head>
+<body class="overflow-hidden h-screen select-none bg-[#0A0A0C] text-[#F8FAFC] transition-colors duration-1000">
+
+  <!-- SCREEN 1: LOGIN -->
+  <section id="screen-login" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0C] px-4">
+    <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+    <div class="w-full max-w-md p-8 rounded-xl border border-white/10 bg-[#0F0F13]/90 shadow-2xl" id="login-container">
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+        <span class="font-mono text-[10px] text-brand-slate uppercase tracking-widest">SYSTEM_AUTH</span>
+        <div class="flex items-center space-x-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-blueSteel animate-pulse"></span>
+          <span class="font-mono text-[10px] text-brand-blueSteel font-bold uppercase tracking-wider">STABLE // SECURE</span>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <label class="block font-mono text-[10px] text-brand-slate uppercase tracking-wider mb-2">User Identity</label>
+          <div class="w-full py-3 px-4 rounded border border-white/5 bg-[#07080B] font-mono text-[#F8FAFC] text-sm flex justify-between items-center">
+            <span class="text-brand-blueSteel font-semibold">FACU</span>
+            <span class="text-[9px] text-brand-slate opacity-40 font-mono">LOCKED_UID</span>
+          </div>
+        </div>
+
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label class="block font-mono text-[10px] text-brand-slate uppercase tracking-wider mb-2">Enter Credentials</label>
+            <input type="password" id="password-input" placeholder="••••••••" maxlength="16" autocomplete="off" class="w-full py-3 px-4 rounded border border-white/10 bg-[#07080B] font-mono text-brand-blueSteel placeholder-[#27272A] text-sm text-center tracking-[0.5em] focus:outline-none" />
+            <p id="login-hint" class="mt-2 text-[11px] text-brand-slate font-mono">Pista: nuestra fecha (DDMMYYYY)</p>
+          </div>
+          <button type="submit" class="w-full py-3 bg-brand-indigo hover:bg-indigo-700 text-white font-mono text-xs font-semibold rounded tracking-widest">DECRYPT SYSTEM</button>
+          <div id="login-status" class="mt-3 p-3 rounded border border-white/5 bg-[#08090B] text-[12px] font-mono text-brand-slate min-h-[42px]"></div>
+        </form>
+      </div>
+
+      <div class="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-brand-slate">
+        <span>IP: REDIRECTED_TUNNEL</span>
+        <span>ENC: AES_256_CBC</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: UPDATE -->
+  <section id="screen-update" class="fixed inset-0 z-40 hidden flex flex-col items-center justify-center bg-[#0A0A0C] px-4">
+    <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+    <div class="w-full max-w-2xl font-mono relative z-10">
+      <div class="mb-4 flex items-center justify-between">
+        <span class="text-xs text-brand-emerald tracking-widest animate-pulse">[ ACTUALIZACIÓN DETECTADA ]</span>
+        <span id="update-percent" class="text-xs text-brand-emerald font-semibold">0%</span>
+      </div>
+
+      <div class="relative w-full h-[2px] bg-white/5 mb-8 rounded-full overflow-hidden">
+        <div id="update-bar" class="absolute top-0 left-0 h-full bg-brand-emerald w-0"></div>
+      </div>
+
+      <div id="console-logs" class="h-64 overflow-y-auto mb-8 p-5 bg-[#0F0F13] rounded-lg border border-white/5 text-xs text-brand-slate space-y-2 scrollbar-thin"></div>
+      <div class="flex justify-center mt-6">
+        <button id="run-env-btn" class="hidden py-3 px-8 rounded-full border border-brand-emerald text-brand-emerald font-mono tracking-widest text-xs">[ RUN_ENV_VER_1.8 ]</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: WELCOME -->
+  <section id="screen-welcome" class="fixed inset-0 z-30 hidden flex-col justify-between bg-[#0A0A0C] p-6 md:p-12 overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.01)_1px,transparent_1px)] [background-size:32px_32px] pointer-events-none"></div>
+    <div class="flex justify-between items-center text-[10px] font-mono text-brand-slate border-b border-white/5 pb-4">
+      <span>REF_NUM: 18_MONTH_MILESTONE</span>
+      <span class="text-brand-blueSteel font-bold">SYSTEM: FACU.EXE</span>
+    </div>
+
+    <div class="flex flex-col items-center justify-center flex-grow py-8 relative z-10">
+      
+        <div class="text-center mb-6">
+        <span class="font-mono text-[10px] text-brand-slate tracking-[0.3em] block mb-2 uppercase opacity-60">CURRENT ENV VERSION</span>
+        <h1 id="welcome-version" class="text-7xl md:text-9xl font-mono font-bold tracking-tighter text-[#F8FAFC]">v1.8</h1>
+      </div>
+
+      <div class="text-center space-y-4 max-w-sm w-full mb-8">
+        <h2 class="font-mono text-sm font-bold text-brand-blueSteel tracking-[0.3em] uppercase">FACU.EXE</h2>
+        <div class="p-4 rounded-lg border border-white/5 bg-[#0F0F13]/90 backdrop-blur-sm text-left text-[11px] font-mono">
+          <div class="flex justify-between"><span class="text-brand-slate">STATUS:</span> <span class="text-brand-emerald font-semibold uppercase tracking-wider">RECUERDO RECUPERADO</span></div>
+          <div class="flex justify-between"><span class="text-brand-slate">FECHA INICIAL:</span> <span class="text-brand-blueSteel">17.12.2024 - 19:00</span></div>
+          <div class="flex justify-between"><span class="text-brand-slate">LUGAR:</span> <span class="text-brand-slate">34.6037° S, 58.3816° W</span></div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <div id="live-day-counter" class="font-mono text-xl md:text-2xl text-white font-semibold tracking-[0.15em] border border-white/5 px-6 py-2.5 rounded-full bg-[#0F0F13]/60">0 DÍAS JUNTOS</div>
+      </div>
+    </div>
+
+      <div class="flex flex-col items-center justify-center pb-6 border-t border-white/5 pt-4">
+      <button id="btn-open-experience" class="py-4 px-12 border border-brand-indigo bg-brand-indigo/10 hover:bg-brand-indigo text-[#F8FAFC] font-mono text-xs tracking-widest rounded">[ ABRIR NUESTRO ARCHIVO ]</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 4: EXPERIENCE -->
+  <main id="screen-experience" class="hidden h-full overflow-y-auto bg-brand-bg scrollbar-thin">
+    <!-- full-screen floating overlay (videos float across entire viewport) -->
+    <div id="floating-overlay" class="fixed inset-0 z-40 pointer-events-none"></div>
+    <header class="sticky top-0 z-30 w-full h-14 border-b border-white/5 bg-[#0A0A0C]/80 backdrop-blur-md flex items-center justify-between px-6">
+      <div class="flex items-center space-x-3"><span class="w-2 h-2 rounded-full bg-brand-emerald animate-pulse"></span><span class="font-mono text-xs tracking-widest text-[#F8FAFC]">FACU.EXE // v1.8</span></div>
+      <div class="font-mono text-xs text-brand-blueSteel tracking-widest"><span id="header-day-counter" class="font-bold">--</span> DÍAS JUNTOS</div>
+      <div class="font-mono text-[10px] text-brand-slate tracking-wider bg-[#0F0F13] px-2.5 py-1 rounded border border-white/5" id="section-badge">SEC_01</div>
+    </header>
+
+    <div class="max-w-3xl mx-auto px-6 py-16 md:py-24 space-y-24 md:space-y-36">
+      <!-- content simplified for local copy -->
+      <section id="sec-01" class="space-y-8 scroll-mt-24">
+        <div id="floating-full" class="w-full h-[72vh] relative overflow-hidden"></div>
+        <div class="border-l border-brand-indigo/40 pl-6 space-y-4">
+          <p class="text-lg md:text-xl font-light leading-relaxed text-[#F8FAFC]"></p>
+          <p class="font-sans text-xs md:text-sm text-brand-slate leading-relaxed">A veces, las mejores arquitecturas comienzan con una sola línea de código limpia. El 17 de diciembre de 2024 a las 19:00, el sistema registró su primer punto de restauración válido.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+
+  <script>
+    // small utility: type a message into a container char-by-char
+    function typeInto(el, text, speed=18){
+      return new Promise(resolve => {
+        el.textContent = '';
+        let i=0;
+        const t = setInterval(()=>{ el.textContent += text[i++]||''; if(i>text.length){ clearInterval(t); resolve(); } }, speed);
+      });
+    }
+
+    function appendStatusLine(container, text){
+      const p = document.createElement('div');
+      p.textContent = '';
+      container.appendChild(p);
+      return typeInto(p, text, 18);
+    }
+
+    function shake(el){
+      el.classList.add('animate-shake');
+      setTimeout(()=>el.classList.remove('animate-shake'), 650);
+    }
+
+    // add small CSS for shake animation
+    const style = document.createElement('style');
+    style.textContent = `@keyframes shakeX{0%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}100%{transform:translateX(0)}}.animate-shake{animation:shakeX .65s cubic-bezier(.36,.07,.19,.97) both}`;
+    document.head.appendChild(style);
+
+    const correctPassword = '17122024';
+    const loginForm = document.getElementById('login-form');
+    const passInput = document.getElementById('password-input');
+    const statusEl = document.getElementById('login-status');
+    const loginContainer = document.getElementById('login-container');
+
+    loginForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      statusEl.innerHTML = '';
+      passInput.disabled = true;
+      loginForm.querySelector('button').disabled = true;
+
+      await appendStatusLine(statusEl, 'Pista encontrada: fecha importante...');
+      await appendStatusLine(statusEl, 'Confirmando credenciales...');
+
+      // small simulated checks
+      await appendStatusLine(statusEl, 'Verificando archivo guardado...');
+      await new Promise(r=>setTimeout(r,300));
+
+      const val = passInput.value.trim();
+      if(val === correctPassword){
+        await appendStatusLine(statusEl, 'Archivo localizado. Acceso concedido.');
+        // success visual: glow and short delay
+        loginContainer.classList.remove('glow-error');
+        loginContainer.classList.add('glow-success');
+        await new Promise(r=>setTimeout(r,450));
+        // transition to update screen
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-update').classList.remove('hidden');
+        // remove success glow after transition
+        setTimeout(()=>loginContainer.classList.remove('glow-success'), 1200);
+        // simulate update progress with couple-oriented logs
+        let p=0;
+        const bar=document.getElementById('update-bar');
+        const percent=document.getElementById('update-percent');
+        const logs = document.getElementById('console-logs');
+        function pushLog(msg){
+          const row = document.createElement('div');
+          const now = new Date();
+          const hh = now.toLocaleTimeString();
+          row.textContent = `[${hh}] ${msg}`;
+          logs.appendChild(row);
+          logs.scrollTop = logs.scrollHeight;
+        }
+        pushLog('SYSTEM: Inicializando el núcleo FACU.EXE...');
+        pushLog('DEPLOY: Estableciendo canal seguro para nosotros...');
+        pushLog('SECURE: Conexión cifrada autorizada para el usuario [FACU]');
+        pushLog('DATABASE: Recuperando recuerdos desde 17.12.2024...');
+        const interval=setInterval(()=>{
+          p+=7; if(p>100)p=100; bar.style.width=p+'%'; percent.textContent=p+'%';
+            if(p===21) pushLog('PROCESSING: Cargando primeras fotos y mensajes...');
+            if(p===49) pushLog('PROCESSING: Ordenando recuerdos por cariño...');
+            if(p===77) pushLog('PROCESSING: Preparando la sorpresa final...');
+            if(p>=100){
+              clearInterval(interval);
+              pushLog('SYSTEM: Inyectando módulos de estabilidad v1.8 (18 Meses)...');
+              // reveal the run button and wait for user action
+              const runBtn = document.getElementById('run-env-btn');
+              if(runBtn){ runBtn.classList.remove('hidden'); runBtn.classList.add('animate-pulse'); }
+            }
+        }, 160);
+          // run button handler: user clicks to continue to welcome
+          const runBtn = document.getElementById('run-env-btn');
+          if(runBtn){
+            runBtn.addEventListener('click', ()=>{
+              runBtn.classList.remove('animate-pulse');
+              runBtn.disabled = true;
+              pushLog('USER: Confirmado. Ejecutando entorno v1.8...');
+              setTimeout(()=>{
+                document.getElementById('screen-update').classList.add('hidden');
+                document.getElementById('screen-welcome').classList.remove('hidden');
+              }, 600);
+            });
+          }
+      } else {
+        await appendStatusLine(statusEl, 'Archivo no encontrado. Acceso denegado.');
+        // show denied visual: shake + red glow briefly
+        loginContainer.classList.remove('glow-success');
+        loginContainer.classList.add('glow-error');
+        shake(loginContainer);
+        setTimeout(()=>loginContainer.classList.remove('glow-error'), 800);
+        passInput.disabled = false;
+        loginForm.querySelector('button').disabled = false;
+      }
+    });
+
+    document.getElementById('btn-open-experience').addEventListener('click', ()=>{
+      document.getElementById('screen-welcome').classList.add('hidden');
+      document.getElementById('screen-experience').classList.remove('hidden');
+      document.body.classList.remove('overflow-hidden');
+    });
+
+    // Live counter: days since 2024-12-17T19:00:00
+    (function(){
+      const start = new Date('2024-12-17T19:00:00');
+      const liveEl = document.getElementById('live-day-counter');
+      const headerCounter = document.getElementById('header-day-counter');
+      if(!liveEl) return;
+
+      function updateDays(){
+        const now = new Date();
+        const diff = now - start;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const display = (days<=0)? `0 DÍAS REGISTRADOS` : `${days.toLocaleString('es-AR')} DÍAS REGISTRADOS`;
+        liveEl.textContent = display;
+        if(headerCounter) headerCounter.textContent = (days<=0)? '0' : days.toLocaleString('es-AR');
+      }
+
+      updateDays();
+      setInterval(updateDays, 1000);
+    })();
+
+    // generate floating placeholder "videos" for atmosphere
+    (function(){
+      // generate large floating placeholders inside full-screen overlay
+      const container = document.getElementById('floating-overlay');
+      if(!container) return;
+      container.innerHTML = '';
+      const count = 8;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for(let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'floating-item floating-big floating-anim';
+        // random positions across the full viewport
+        const left = Math.random()*(w - 200);
+        const top = Math.random()*(h - 120);
+        el.style.left = left + 'px';
+        el.style.top = top + 'px';
+        el.style.zIndex = 60 + i;
+        el.style.opacity = 0.9 - Math.random()*0.25;
+        el.style.animationDuration = (6 + Math.random()*6) + 's';
+        el.innerHTML = `<div class="thumb">▶ Nuestro video ${i+1}</div>`;
+        // clicking a big placeholder opens modal / experience viewer
+        el.addEventListener('click', ()=>{
+          el.style.transform = 'scale(1.06) translateY(-6px)';
+          setTimeout(()=>{ el.style.transform=''; }, 400);
+        });
+        // allow pointer events on items even if overlay is pointer-events:none
+        el.style.pointerEvents = 'auto';
+        container.appendChild(el);
+      }
+      // gentle parallax with mouse (apply to all children)
+      window.addEventListener('mousemove', (e)=>{
+        const cx = e.clientX; const cy = e.clientY;
+        const centerX = window.innerWidth/2; const centerY = window.innerHeight/2;
+        [...container.children].forEach((child,idx)=>{
+          const depth = 0.015 + (idx%5)/50;
+          const tx = (cx - centerX)*depth;
+          const ty = (cy - centerY)*depth;
+          child.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

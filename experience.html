@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Experience — FACU.EXE</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .experience-main{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 20px}
+    .hero-sm{max-width:980px; width:100%; text-align:center;margin-bottom:24px}
+    .hero-sm h2{font-size:1.2rem;color:#9fb4ff;margin-bottom:6px}
+    .hero-sm p{color:#cfd8ff}
+
+    .controls{display:flex;gap:12px;align-items:center;justify-content:center;margin:20px 0}
+    .primary-btn, .update-actions button{cursor:pointer}
+
+    .thumb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;max-width:980px;width:100%}
+    .thumb{background:#0f1419;border-radius:10px;overflow:hidden;height:120px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .thumb img{max-width:100%;max-height:100%;object-fit:cover}
+
+    .photo-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,6,10,0.88);z-index:9999;padding:20px}
+    .photo-modal .frame{max-width:1100px;width:100%;background:rgba(12,16,22,0.95);padding:18px;border-radius:12px;display:flex;gap:12px;align-items:flex-start}
+    .photo-modal img{max-width:60%;border-radius:8px}
+    .meta{flex:1;color:#cfe0ff}
+    .meta textarea{width:100%;height:160px;background:#0f1419;border-radius:8px;border:1px solid rgba(255,255,255,0.04);color:white;padding:10px}
+    .photo-modal .close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:white;font-size:22px;cursor:pointer}
+
+    .small-note{font-size:.95rem;color:#9fb4ff;margin-top:8px}
+    @media (max-width:700px){.photo-modal .frame{flex-direction:column}.photo-modal img{max-width:100%}}
+  </style>
+</head>
+<body class="welcome-page">
+
+<header class="top-bar"><div class="logo">FACU.EXE</div><div class="counter"><span id="months">0</span> meses · <span id="days">0</span> días · <span id="hours">0</span> horas</div></header>
+
+<main class="experience-main">
+  <div class="hero-sm">
+    <h2>Feliz 1.5 años ♥</h2>
+    <h1 style="margin:.3rem 0 10px; font-size:3rem">Nuestra historia</h1>
+    <p>Bienvenido a un rincón con fotos, recuerdos y pequeñas sorpresas. Sube tus fotos y toca cualquier miniatura para verla grande. Puedes agregar notas a cada foto.</p>
+  </div>
+
+  <div class="controls">
+    <label class="primary-btn" style="padding:10px 14px;background:#4f46e5;border-radius:8px;color:white;">Seleccionar fotos
+      <input id="photoInput" type="file" accept="image/*" multiple style="display:none">
+    </label>
+    <button id="clearBtn" class="update-actions secondary" style="padding:10px 14px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:#9fb4ff;border-radius:8px">Limpiar galería</button>
+    <div class="small-note">Las imágenes se cargan sólo en tu navegador (no se suben a internet).</div>
+  </div>
+
+  <div id="thumbnails" class="thumb-grid" aria-live="polite"></div>
+
+</main>
+
+<!-- Modal -->
+<div id="photoModal" class="photo-modal oculto" role="dialog" aria-modal="true">
+  <button class="close" id="closeModal">✕</button>
+  <div class="frame">
+    <img id="modalImg" src="" alt="Foto grande">
+    <div class="meta">
+      <p id="metaInfo">Foto</p>
+      <textarea id="caption" placeholder="Escribe una nota sobre esta foto..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+        <button id="saveNote" class="primary-btn" style="padding:8px 12px;background:#4f46e5;border-radius:8px;color:white;border:none">Guardar nota</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const input = document.getElementById('photoInput');
+  const thumbs = document.getElementById('thumbnails');
+  const modal = document.getElementById('photoModal');
+  const modalImg = document.getElementById('modalImg');
+  const caption = document.getElementById('caption');
+  const metaInfo = document.getElementById('metaInfo');
+  const closeBtn = document.getElementById('closeModal');
+  const saveNote = document.getElementById('saveNote');
+  const clearBtn = document.getElementById('clearBtn');
+
+  // store images and notes in-memory
+  const items = [];
+  let currentIndex = -1;
+
+  function renderThumbs(){
+    thumbs.innerHTML = '';
+    items.forEach((it, i)=>{
+      const d = document.createElement('div'); d.className='thumb'; d.tabIndex=0; d.setAttribute('role','button');
+      const img = document.createElement('img'); img.src = it.src; img.alt = 'Foto ' + (i+1);
+      d.appendChild(img);
+      d.addEventListener('click', ()=> openModal(i));
+      d.addEventListener('keydown', (e)=>{ if(e.key==='Enter') openModal(i)});
+      thumbs.appendChild(d);
+    })
+  }
+
+  function openModal(index){
+    currentIndex = index;
+    const it = items[index];
+    modalImg.src = it.src;
+    metaInfo.textContent = `Foto ${index+1} — ${it.name || ''}`;
+    caption.value = it.note || '';
+    modal.classList.remove('oculto');
+    caption.focus();
+  }
+
+  function closeModal(){
+    modal.classList.add('oculto');
+    currentIndex = -1;
+  }
+
+  input.addEventListener('change', (e)=>{
+    const files = Array.from(e.target.files).slice(0,30);
+    files.forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        items.push({src:ev.target.result, name:file.name, note:''});
+        renderThumbs();
+      }
+      reader.readAsDataURL(file);
+    });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+
+  saveNote.addEventListener('click', ()=>{
+    if(currentIndex>=0){ items[currentIndex].note = caption.value; renderThumbs(); }
+  });
+
+  clearBtn.addEventListener('click', ()=>{ if(confirm('Borrar todas las fotos de la galería?')){ items.length=0; renderThumbs(); } });
+
+  // keyboard navigation
+  document.addEventListener('keydown', (e)=>{
+    if(modal.classList.contains('oculto')) return;
+    if(e.key==='ArrowRight'){
+      if(currentIndex < items.length-1) openModal(currentIndex+1);
+    }
+    if(e.key==='ArrowLeft'){
+      if(currentIndex > 0) openModal(currentIndex-1);
+    }
+    if(e.key==='Escape') closeModal();
+  });
+
+})();
+</script>
+
+</body>
+</html>
